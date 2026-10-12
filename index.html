@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Викторина: От недр Земли до полимеров</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    margin: 0; padding: 16px;
+    background: #f4f6f9; color: #1a1a1a;
+    line-height: 1.5;
+  }
+  .container { max-width: 640px; margin: 0 auto; }
+  header {
+    background: #d71920; color: #fff;
+    padding: 20px; border-radius: 12px;
+    text-align: center; margin-bottom: 20px;
+  }
+  header h1 { margin: 0 0 8px; font-size: 20px; }
+  header p { margin: 0; font-size: 13px; opacity: .9; }
+  .q {
+    background: #fff; padding: 16px; border-radius: 10px;
+    margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .q p.title { margin: 0 0 12px; font-weight: 600; }
+  .q label {
+    display: block; padding: 10px 12px; margin-bottom: 6px;
+    border: 1.5px solid #e0e4ea; border-radius: 8px;
+    cursor: pointer; transition: .15s; font-size: 15px;
+  }
+  .q label:active { background: #f0f2f6; }
+  .q input { margin-right: 8px; }
+  .q label.correct { border-color: #2e9e4f; background: #e8f8ec; }
+  .q label.wrong   { border-color: #d71920; background: #fdecec; }
+  button {
+    width: 100%; padding: 15px; font-size: 17px; font-weight: 600;
+    background: #d71920; color: #fff; border: none;
+    border-radius: 10px; cursor: pointer; margin-top: 8px;
+  }
+  button:disabled { background: #b9bec6; cursor: default; }
+  #result {
+    display: none; background: #fff; padding: 20px;
+    border-radius: 10px; margin-top: 16px; text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  #result .score { font-size: 34px; font-weight: 700; margin-bottom: 8px; }
+  #result .text { font-size: 16px; margin-bottom: 16px; }
+  #result button { background: #2c3e50; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>«От недр Земли до полимеров»</h1>
+    <p>К 35-летию ЛУКОЙЛ и 45-летию ООО «Ставролен»</p>
+  </header>
+
+  <div id="quiz"></div>
+  <button id="submitBtn" onclick="check()">Проверить результат</button>
+
+  <div id="result">
+    <div class="score" id="scoreText"></div>
+    <div class="text" id="scoreComment"></div>
+    <button onclick="location.reload()">Пройти заново</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "1. Что такое нефть?",
+    options: [
+      "Минеральное масло",
+      "Природная маслянистая горючая жидкость, состоящая из сложной смеси углеводородов и некоторых других органических соединений",
+      "Синтетический продукт"
+    ],
+    correct: 1
+  },
+  {
+    q: "2. Что такое баррель в контексте нефтяной отрасли?",
+    options: [
+      "Единица объёма нефти (обычно 159 л)",
+      "Инструмент для бурения",
+      "Вид нефтепродукта"
+    ],
+    correct: 0
+  },
+  {
+    q: "3. Какая последовательность этапов наиболее точно отражает путь нефти и газа от месторождения до конечного потребителя?",
+    options: [
+      "Георазведка → Добыча нефти → Переработка нефти и газа → Производство электроэнергии",
+      "Добыча нефти → Георазведка → Переработка нефти и газа → Производство электроэнергии",
+      "Георазведка → Переработка нефти и газа → Добыча нефти → Производство электроэнергии",
+      "Добыча нефти → Георазведка → Переработка нефти и газа → Производство электроэнергии"
+    ],
+    correct: 0
+  },
+  {
+    q: "4. Дата образования нефтяного концерна «Лукойл».",
+    options: ["25.12.1994 г.", "21.01.1981 г.", "25.11.1991 г."],
+    correct: 2
+  },
+  {
+    q: "5. Что изготавливают из продуктов переработки нефти и газа?",
+    options: [
+      "Дизельное топливо, керосин, битум, сырьё для пластмасс",
+      "Пластмассу, технические масла и другие продукты",
+      "Лекарства, духи, ароматизаторы, продукты питания",
+      "Топливо, пластмассу, лекарства, духи, продукты питания и другие товары"
+    ],
+    correct: 3
+  },
+  {
+    q: "6. Что из перечисленного не является продуктом нефтепереработки?",
+    options: ["Бензин", "Дизельное топливо", "Природный газ", "Керосин"],
+    correct: 2
+  },
+  {
+    q: "7. Что сыграло решающую роль в выборе г. Прикумска для строительства Прикумского завода пластических масс?",
+    options: [
+      "Наличие в окрестностях Буденновска крупных месторождений нефти",
+      "Близость к источникам дешёвой электроэнергии",
+      "Через город проходила железная дорога",
+      "Потребность в создании новых рабочих мест и развитии социальной инфраструктуры города"
+    ],
+    correct: 2
+  },
+  {
+    q: "8. Какие крупные социальные проекты реализованы в г. Буденновске совместно с ПАО «Лукойл» и ООО «Ставролен»?",
+    options: [
+      "Спортивная арена «Лужники»",
+      "Детский игровой комплекс «Олимпийский»",
+      "Спортивно-тренировочный комплекс «Лукоморье»",
+      "Автобусная остановка «Новый город»"
+    ],
+    correct: 2
+  }
+];
+
+const quiz = document.getElementById('quiz');
+questions.forEach((item, i) => {
+  let html = `<div class="q" id="q${i}"><p class="title">${item.q}</p>`;
+  item.options.forEach((opt, j) => {
+    html += `<label id="lbl-${i}-${j}">
+      <input type="radio" name="q${i}" value="${j}"> ${opt}
+    </label>`;
+  });
+  quiz.innerHTML += html + '</div>';
+});
+
+function check() {
+  let score = 0;
+  let allAnswered = true;
+
+  questions.forEach((item, i) => {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!sel) { allAnswered = false; return; }
+  });
+
+  if (!allAnswered) {
+    alert("Ответьте, пожалуйста, на все вопросы!");
+    return;
+  }
+
+  questions.forEach((item, i) => {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    const chosen = +sel.value;
+    if (chosen === item.correct) score++;
+
+    // подсветка правильных и неправильных
+    document.getElementById(`lbl-${i}-${item.correct}`).classList.add('correct');
+    if (chosen !== item.correct) {
+      document.getElementById(`lbl-${i}-${chosen}`).classList.add('wrong');
+    }
+    document.querySelectorAll(`input[name="q${i}"]`).forEach(inp => inp.disabled = true);
+  });
+
+  const total = questions.length;
+  const percent = Math.round(score / total * 100);
+  let comment = "";
+  if (percent === 100) comment = "Отличный результат! Вы настоящий знаток нефтяной отрасли! 🏆";
+  else if (percent >= 75) comment = "Хороший результат! Немного повторите материал и будет отлично. 👍";
+  else if (percent >= 50) comment = "Неплохо, но есть что подтянуть. Загляните в экспозицию ещё раз. 📖";
+  else comment = "Стоит внимательнее изучить выставку — и всё получится! 💪";
+
+  document.getElementById('scoreText').textContent = `${score} из ${total} (${percent}%)`;
+  document.getElementById('scoreComment').textContent = comment;
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
